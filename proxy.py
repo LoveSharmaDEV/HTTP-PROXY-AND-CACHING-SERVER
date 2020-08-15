@@ -10,7 +10,7 @@ RECV_SIZE = 4096
 CACHE_DIR = "./cache"
 MAX_CACHE_RECORDS = 3
 CACHE_THRESHOLD = 3
-proxy_port = 20000
+PROXY_PORT = 20000
 
 if not os.path.isdir(CACHE_DIR):
     os.makedirs(CACHE_DIR)
@@ -69,15 +69,15 @@ def Get_Current_Cache_Info(file_requested):
     
 '''
 This fuction basically adds 3 more components in our detail dictionary
-1. request_info["do_cache"]: Tells whether to cache or not
+1. request_info["cache_yes_no"]: Tells whether to cache or not
 2. request_info["cache_path"]: Its the path to cached file
 3. request_info["last_mtime"]: File last modified
 '''
 def get_cache_request_info(client_addr, request_info):
     Cache_Memory(request_info["total_url"], client_addr)
-    do_cache = Cache_Decision(request_info["total_url"])
+    cache_yes_no = Cache_Decision(request_info["total_url"])
     cache_path, last_mtime = Get_Current_Cache_Info(request_info["total_url"])
-    request_info["do_cache"] = do_cache
+    request_info["cache_yes_no"] = cache_yes_no
     request_info["cache_path"] = cache_path
     request_info["last_mtime"] = last_mtime
     return request_info
@@ -159,8 +159,8 @@ def insert_if_modified(request_info):
     while lines[len(lines)-1] == '':
         lines.remove('')
 
-    #header = "If-Modified-Since: " + time.strptime("%a %b %d %H:%M:%S %Y", request_info["last_mtime"])
     header = time.strftime("%a %b %d %H:%M:%S %Y", request_info["last_mtime"])
+    print("this is last_time "+ header )
     header = "If-Modified-Since: " + header
     lines.append(header)
 
@@ -168,11 +168,10 @@ def insert_if_modified(request_info):
     return request_info
 
 
-# serve get request
 def get_request_handler(client_socket, client_addr, request_info):
     try:
         client_data = request_info["client_data"]
-        do_cache = request_info["do_cache"]
+        cache_yes_no = request_info["cache_yes_no"]
         cache_path = request_info["cache_path"]
         last_mtime = request_info["last_mtime"]
 
@@ -192,7 +191,7 @@ def get_request_handler(client_socket, client_addr, request_info):
             f.close()
 
         else:
-            if do_cache:
+            if cache_yes_no:
                 print("Caching file " + cache_path  + " and sending to " + str(client_addr))
                 freeup_cache(request_info["total_url"])
                 f = open(cache_path, "w+")
@@ -258,6 +257,7 @@ def request_handler(client_socket, client_addr, client_data):
         return
     elif request_info["method"] == "GET":
         request_info = get_cache_request_info(client_addr, request_info)
+        
         if request_info["last_mtime"]:
             request_info = insert_if_modified(request_info)
         get_request_handler(client_socket, client_addr, request_info)
@@ -276,7 +276,7 @@ def proxy_handler():
     try:
         proxy_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         proxy_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        proxy_socket.bind(('', proxy_port))
+        proxy_socket.bind(('', PROXY_PORT))
         proxy_socket.listen(MAX_CONN)
         
         print("Startig proxy on "+ str(proxy_socket.getsockname()[0]) + " port " + str(proxy_socket.getsockname()[1])) 
