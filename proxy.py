@@ -153,7 +153,7 @@ def parse_request_info(client_addr, client_data):
 
 
 # insert the header
-def insert_if_modified(request_info):
+def if_modified_since_header(request_info):
 
     lines = str(request_info["client_data"],'utf-8' ).splitlines()
     while lines[len(lines)-1] == '':
@@ -259,7 +259,7 @@ def request_handler(client_socket, client_addr, client_data):
         request_info = get_cache_request_info(client_addr, request_info)
         
         if request_info["last_mtime"]:
-            request_info = insert_if_modified(request_info)
+            request_info = if_modified_since_header(request_info)
         get_request_handler(client_socket, client_addr, request_info)
 
     elif request_info["method"] == "POST":
