@@ -9,6 +9,7 @@
 ***In Computer Networking*** a proxy server is a server application that acts as a intermediary for requests from clients seeking resources from servers that provide those resources.
 
 ## A CACHING SERVER
+<img src='Images/screen3.jpg'>
 
 
 * ***Caching*** is facility that is present inside a proxy server. Web proxy caching stores copies of frequently accessed Web objects (such as documents, images, and articles) close to users and serves this information to them. Internet users get their information faster, and Internet bandwidth is freed for other tasks.
