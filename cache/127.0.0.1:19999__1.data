@@ -1,9 +1,0 @@
-HTTP/1.0 200 OK
-Server: SimpleHTTP/0.6 Python/3.7.6
-Date: Fri, 14 Aug 2020 13:55:17 GMT
-Content-type: application/octet-stream
-Content-Length: 20
-Last-Modified: Fri, 14 Aug 2020 12:41:48 GMT
-
-This is a try ball
-
